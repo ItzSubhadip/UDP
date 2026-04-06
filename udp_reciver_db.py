@@ -24,12 +24,22 @@ while True:
 
     sender_ip = addr[0]
     sender_port = addr[1]
+
+    # Destination info (this machine)
+    dest_ip = sock.getsockname()[0]
+    dest_port = sock.getsockname()[1]
+
     message = data.decode()
 
-    print(f"Received from {sender_ip}:{sender_port} -> {message}")
+    print(f"{sender_ip}:{sender_port}  --->  {dest_ip}:{dest_port}  |  {message}")
 
-    query = "INSERT INTO udp_packets (sender_ip, sender_port, message) VALUES (%s, %s, %s)"
-    values = (sender_ip, sender_port, message)
+    query = """
+    INSERT INTO udp_packets 
+    (sender_ip, sender_port, dest_ip, dest_port, message) 
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    
+    values = (sender_ip, sender_port, dest_ip, dest_port, message)
 
     cursor.execute(query, values)
     db.commit()
